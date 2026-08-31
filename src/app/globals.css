@@ -1,26 +1,35 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource/roboto-mono/latin-100.css";
+@import "@fontsource/roboto-mono/latin-200.css";
+@import "@fontsource/roboto-mono/latin-300.css";
+@import "@fontsource/roboto-mono/latin-400.css";
+@import "@fontsource/roboto-mono/latin-500.css";
+@import "@fontsource/roboto-mono/latin-600.css";
+@import "@fontsource/roboto-mono/latin-700.css";
+@import "@fontsource/plus-jakarta-sans/latin-200.css";
+@import "@fontsource/plus-jakarta-sans/latin-300.css";
+@import "@fontsource/plus-jakarta-sans/latin-400.css";
+@import "@fontsource/plus-jakarta-sans/latin-500.css";
+@import "@fontsource/plus-jakarta-sans/latin-600.css";
+@import "@fontsource/plus-jakarta-sans/latin-700.css";
+@import "@fontsource/plus-jakarta-sans/latin-800.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+:root { --background: #1a1a1a; --foreground: #ffffff; --border: oklch(1 0 0 / 10%); --input: oklch(1 0 0 / 15%); --ring: oklch(0.556 0 0); }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* The source app uses these class names, so keep the aliases while using real font files. */
+.font-\[roboto_mono\] { font-family: "Roboto Mono", monospace; }
+.font-\[plus_jakarta_sans\] { font-family: "Plus Jakarta Sans", sans-serif; }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground; font-family: "Plus Jakarta Sans", sans-serif; }
 }
