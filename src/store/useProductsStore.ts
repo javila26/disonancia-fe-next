@@ -58,7 +58,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     set({ loading: true });
 
     try {
-      const { data } = await api.get<PaginatedResponse<Product>>("/api/vinyls", {
+      const { data } = await api.get<PaginatedResponse<Product>>("/vinyls", {
         params: { page, limit },
       });
 
@@ -87,7 +87,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
       let product = products.find((p) => p.id === id);
 
       if (!product) {
-        const response = await api.get<EntityResponse<Product>>(`/api/vinyls/${id}`);
+        const response = await api.get<EntityResponse<Product>>(`/vinyls/${id}`);
         const data = response.data;
 
         if (data.success) {
@@ -132,7 +132,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     try {
       set({ loading: true });
 
-      const response = await api.patch<EntityResponse<Product>>(`/api/vinyls/${id}`, body);
+      const response = await api.patch<EntityResponse<Product>>(`/vinyls/${id}`, body);
       const data = response.data;
 
       if (data.success && data.data) {
@@ -155,7 +155,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     try {
       set({ loading: true });
 
-      const response = await api.delete<{ success: boolean }>(`/api/vinyls/${id}`);
+      const response = await api.delete<{ success: boolean }>(`/vinyls/${id}`);
       const data = response.data;
 
       if (data.success) {

@@ -28,7 +28,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
     set({ loading: true });
 
     try {
-      const { data } = await api.get<PaginatedResponse<Category>>("/api/categories", {
+      const { data } = await api.get<PaginatedResponse<Category>>("/categories", {
         params: { page, limit },
       });
 
@@ -53,7 +53,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
       let category = categories.find((item) => item.id === id) ?? null;
 
       if (!category) {
-        const response = await api.get<EntityResponse<Category>>(`/api/categories/${id}`);
+        const response = await api.get<EntityResponse<Category>>(`/categories/${id}`);
         const data = response.data;
 
         if (data.success) {
@@ -73,7 +73,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
     try {
       set({ loading: true });
 
-      const response = await api.post<EntityResponse<Category>>("/api/categories", body);
+      const response = await api.post<EntityResponse<Category>>("/categories", body);
       const data = response.data;
 
       if (data.success && data.data) {
@@ -96,7 +96,7 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
     try {
       set({ loading: true });
 
-      const response = await api.patch<EntityResponse<Category>>(`/api/categories/${id}`, body);
+      const response = await api.patch<EntityResponse<Category>>(`/categories/${id}`, body);
       const data = response.data;
 
       if (data.success && data.data) {
