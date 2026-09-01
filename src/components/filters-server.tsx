@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
@@ -27,9 +27,22 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
+  const priceDebounce = useRef<Partial<Record<"minPrice" | "maxPrice", ReturnType<typeof setTimeout>>>>({});
+
+  useEffect(() => () => {
+    Object.values(priceDebounce.current).forEach((timer) => timer && clearTimeout(timer));
+  }, []);
 
   const navigate = (query: string) => {
     startTransition(() => router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false }));
+  };
+
+  const updatePrice = (key: "minPrice" | "maxPrice", value: string) => {
+    if (priceDebounce.current[key]) clearTimeout(priceDebounce.current[key]);
+    priceDebounce.current[key] = setTimeout(() => {
+      navigate(updateQuery(searchParams, key, value));
+      delete priceDebounce.current[key];
+    }, 350);
   };
 
   const availability = searchParams.get("available");
@@ -42,6 +55,8 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
         <button
           type="button"
           onClick={() => {
+            Object.values(priceDebounce.current).forEach((timer) => timer && clearTimeout(timer));
+            priceDebounce.current = {};
             const next = new URLSearchParams(searchParams);
             ["category", "available", "minPrice", "maxPrice", "page"].forEach((key) => next.delete(key));
             navigate(next.toString());
@@ -55,14 +70,14 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
         <AccordionItem value="price">
           <AccordionTrigger className="font-[plus_jakarta_sans]">Precio</AccordionTrigger>
           <AccordionContent>
-            <div className="grid grid-cols-2 gap-3">
+            <div key={`${searchParams.get("minPrice") ?? ""}-${searchParams.get("maxPrice") ?? ""}`} className="grid grid-cols-2 gap-3">
               <label className="text-sm text-white/70">
                 Desde
-                <input type="number" min="0" step="1" defaultValue={searchParams.get("minPrice") ?? ""} onChange={(event) => navigate(updateQuery(searchParams, "minPrice", event.target.value))} className="mt-2 h-9 w-full rounded border border-white/20 bg-transparent px-2 text-white outline-none focus:border-white" />
+                <input type="number" min="0" step="1" defaultValue={searchParams.get("minPrice") ?? ""} onChange={(event) => updatePrice("minPrice", event.target.value)} className="mt-2 h-9 w-full rounded border border-white/20 bg-transparent px-2 text-white outline-none focus:border-white" />
               </label>
               <label className="text-sm text-white/70">
                 Hasta
-                <input type="number" min="0" step="1" defaultValue={searchParams.get("maxPrice") ?? ""} onChange={(event) => navigate(updateQuery(searchParams, "maxPrice", event.target.value))} className="mt-2 h-9 w-full rounded border border-white/20 bg-transparent px-2 text-white outline-none focus:border-white" />
+                <input type="number" min="0" step="1" defaultValue={searchParams.get("maxPrice") ?? ""} onChange={(event) => updatePrice("maxPrice", event.target.value)} className="mt-2 h-9 w-full rounded border border-white/20 bg-transparent px-2 text-white outline-none focus:border-white" />
               </label>
             </div>
           </AccordionContent>
