@@ -101,7 +101,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
           {vinylRecords.length === 0 ? (
             <div className="flex min-h-[320px] items-center justify-center text-xl text-white">No vinyls found</div>
           ) : (
-            <div className="grid grid-cols-2 justify-items-center gap-4 sm:gap-5 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 2xl:gap-8">
+            <div className="grid grid-cols-2 justify-items-center gap-4 sm:gap-5 md:grid-cols-3 xl:grid-cols-5  2xl:gap-8">
               {vinylRecords.map((product) => {
                 const coverImage = product.images.find((image) => image.type === "cover");
                 return (

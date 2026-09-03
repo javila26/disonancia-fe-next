@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useTransition } from "react";
+import { useTransition } from "react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
@@ -27,36 +27,21 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
-  const priceDebounce = useRef<Partial<Record<"minPrice" | "maxPrice", ReturnType<typeof setTimeout>>>>({});
-
-  useEffect(() => () => {
-    Object.values(priceDebounce.current).forEach((timer) => timer && clearTimeout(timer));
-  }, []);
 
   const navigate = (query: string) => {
     startTransition(() => router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false }));
-  };
-
-  const updatePrice = (key: "minPrice" | "maxPrice", value: string) => {
-    if (priceDebounce.current[key]) clearTimeout(priceDebounce.current[key]);
-    priceDebounce.current[key] = setTimeout(() => {
-      navigate(updateQuery(searchParams, key, value));
-      delete priceDebounce.current[key];
-    }, 350);
   };
 
   const availability = searchParams.get("available");
   const category = searchParams.get("category");
 
   return (
-    <div className="h-fit w-11/12 text-white sm:w-96">
+    <div className="h-fit text-white ">
       <div className="flex items-center justify-between">
         <h1 className="text-4xl font-[plus_jakarta_sans]">Filtros</h1>
         <button
           type="button"
           onClick={() => {
-            Object.values(priceDebounce.current).forEach((timer) => timer && clearTimeout(timer));
-            priceDebounce.current = {};
             const next = new URLSearchParams(searchParams);
             ["category", "available", "minPrice", "maxPrice", "page"].forEach((key) => next.delete(key));
             navigate(next.toString());
@@ -70,14 +55,28 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
         <AccordionItem value="price">
           <AccordionTrigger className="font-[plus_jakarta_sans]">Precio</AccordionTrigger>
           <AccordionContent>
-            <div key={`${searchParams.get("minPrice") ?? ""}-${searchParams.get("maxPrice") ?? ""}`} className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <label className="text-sm text-white/70">
                 Desde
-                <input type="number" min="0" step="1" defaultValue={searchParams.get("minPrice") ?? ""} onChange={(event) => updatePrice("minPrice", event.target.value)} className="mt-2 h-9 w-full rounded border border-white/20 bg-transparent px-2 text-white outline-none focus:border-white" />
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  defaultValue={searchParams.get("minPrice") ?? ""}
+                  onChange={(event) => navigate(updateQuery(searchParams, "minPrice", event.target.value))}
+                  className="mt-2 h-9 w-full rounded border border-white/20 bg-transparent px-2 text-white outline-none focus:border-white"
+                />
               </label>
               <label className="text-sm text-white/70">
                 Hasta
-                <input type="number" min="0" step="1" defaultValue={searchParams.get("maxPrice") ?? ""} onChange={(event) => updatePrice("maxPrice", event.target.value)} className="mt-2 h-9 w-full rounded border border-white/20 bg-transparent px-2 text-white outline-none focus:border-white" />
+                <input
+                  type="number"
+                  min="0"
+                  step="1"
+                  defaultValue={searchParams.get("maxPrice") ?? ""}
+                  onChange={(event) => navigate(updateQuery(searchParams, "maxPrice", event.target.value))}
+                  className="mt-2 h-9 w-full rounded border border-white/20 bg-transparent px-2 text-white outline-none focus:border-white"
+                />
               </label>
             </div>
           </AccordionContent>
@@ -85,14 +84,21 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
         <AccordionItem value="availability">
           <AccordionTrigger className="font-[plus_jakarta_sans]">Disponibilidad</AccordionTrigger>
           <AccordionContent>
-            {[['true', 'Disponible'], ['false', 'No Disponible']].map(([value, label]) => (
+            {[
+              ["true", "Disponible"],
+              ["false", "No Disponible"],
+            ].map(([value, label]) => (
               <div key={value} className="flex h-10 items-center space-x-2">
                 <Checkbox
                   id={`available-${value}`}
                   checked={availability === value}
-                  onCheckedChange={(checked) => navigate(updateQuery(searchParams, "available", checked ? value : undefined))}
+                  onCheckedChange={(checked) =>
+                    navigate(updateQuery(searchParams, "available", checked ? value : undefined))
+                  }
                 />
-                <Label htmlFor={`available-${value}`} className="font-[plus_jakarta_sans]">{label}</Label>
+                <Label htmlFor={`available-${value}`} className="font-[plus_jakarta_sans]">
+                  {label}
+                </Label>
               </div>
             ))}
           </AccordionContent>
@@ -105,9 +111,13 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
                 <Checkbox
                   id={`category-${item.id}`}
                   checked={category === item.slug}
-                  onCheckedChange={(checked) => navigate(updateQuery(searchParams, "category", checked ? item.slug : undefined))}
+                  onCheckedChange={(checked) =>
+                    navigate(updateQuery(searchParams, "category", checked ? item.slug : undefined))
+                  }
                 />
-                <Label htmlFor={`category-${item.id}`} className="font-[plus_jakarta_sans]">{item.name}</Label>
+                <Label htmlFor={`category-${item.id}`} className="font-[plus_jakarta_sans]">
+                  {item.name}
+                </Label>
               </div>
             ))}
           </AccordionContent>

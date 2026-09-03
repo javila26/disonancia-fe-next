@@ -7,10 +7,16 @@ const VINYL_IMAGE_TYPES = ["cover", "back", "gallery"] as const;
 
 type VinylImageType = (typeof VINYL_IMAGE_TYPES)[number];
 
+export type VinylTracklist = {
+  side: string;
+  tracks: string[];
+}[];
+
 export type VinylFormState = {
   name: string;
   slug: string;
   artist: string;
+  spotifyAlbumId: string;
   year: number;
   price: number;
   purchasePrice: number;
@@ -18,6 +24,7 @@ export type VinylFormState = {
   stock: number;
   category: string;
   numberOfDiscs: number;
+  tracklist: VinylTracklist;
   available: string;
   images: [File | null, File | null, File | null];
 };
@@ -31,6 +38,7 @@ export type VinylPayload = {
   name: string;
   slug: string;
   artist: string;
+  spotifyAlbumId: string;
   year: number;
   price: number;
   purchasePrice: number;
@@ -38,6 +46,7 @@ export type VinylPayload = {
   stock: number;
   category: string;
   numberOfDiscs: number;
+  tracklist: VinylTracklist;
   available: boolean;
   images: VinylImagePayload[];
 };
@@ -54,29 +63,55 @@ export const initialFormState: VinylFormState = {
   name: "",
   slug: "",
   artist: "",
+  spotifyAlbumId: "",
   year: 0,
   price: 0,
   purchasePrice: 0,
   discount: 0,
   stock: 0,
-  numberOfDiscs: 0,
+  numberOfDiscs: 1,
   category: "",
+  tracklist: createVinylTracklist(1),
   available: "true",
   images: [null, null, null],
 };
+
+export function createVinylTracklist(numberOfDiscs: number, existingTracklist?: VinylTracklist): VinylTracklist {
+  const discCount = Math.max(1, Math.floor(Number(numberOfDiscs) || 1));
+  const savedTracklist = existingTracklist ?? [];
+
+  return Array.from({ length: discCount * 2 }, (_, index) => {
+    const side = String.fromCharCode(65 + index);
+    const existingSide = savedTracklist.find((face) => face.side === side);
+
+    return {
+      side,
+      tracks: existingSide?.tracks.length ? [...existingSide.tracks] : [""],
+    };
+  });
+}
+
+function getTracklistPayload(tracklist: VinylTracklist): VinylTracklist {
+  return tracklist.map((side) => ({
+    side: side.side,
+    tracks: side.tracks.filter((track) => track.trim().length > 0),
+  }));
+}
 
 export function createVinylFormState(product: Product): VinylFormState {
   return {
     name: product.name,
     slug: product.slug,
     artist: product.artist,
+    spotifyAlbumId: product.spotifyAlbumId ?? "",
     year: Number(product.year),
     price: product.price,
     purchasePrice: product.purchasePrice,
     discount: product.discount,
     stock: product.stock,
     category: "",
-    numberOfDiscs: product.numberOfDiscs,
+    numberOfDiscs: Math.max(1, Number(product.numberOfDiscs) || 1),
+    tracklist: createVinylTracklist(product.numberOfDiscs, product.tracklist),
     available: String(product.available),
     images: [null, null, null],
   };
@@ -137,6 +172,7 @@ export async function buildVinylPayload(formData: VinylFormState): Promise<Vinyl
     name: formData.name,
     slug: formData.slug,
     artist: formData.artist,
+    spotifyAlbumId: formData.spotifyAlbumId,
     year: formData.year,
     price: formData.price,
     purchasePrice: formData.purchasePrice,
@@ -144,6 +180,7 @@ export async function buildVinylPayload(formData: VinylFormState): Promise<Vinyl
     stock: formData.stock,
     category: formData.category,
     numberOfDiscs: formData.numberOfDiscs,
+    tracklist: getTracklistPayload(formData.tracklist),
     available: formData.available === "true",
     images,
   };
@@ -169,6 +206,7 @@ export async function buildVinylUpdatePayload(formData: VinylFormState): Promise
     name: formData.name,
     slug: formData.slug,
     artist: formData.artist,
+    spotifyAlbumId: formData.spotifyAlbumId,
     year: formData.year,
     price: formData.price,
     purchasePrice: formData.purchasePrice,
@@ -176,6 +214,7 @@ export async function buildVinylUpdatePayload(formData: VinylFormState): Promise
     stock: formData.stock,
     category: formData.category,
     numberOfDiscs: formData.numberOfDiscs,
+    tracklist: getTracklistPayload(formData.tracklist),
     available: formData.available === "true",
     ...(images.length > 0 ? { images } : {}),
   };

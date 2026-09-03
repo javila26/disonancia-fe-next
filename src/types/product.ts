@@ -16,4 +16,9 @@ export interface Product {
   numberOfDiscs: number;
   category: Category;
   description?: string;
+  spotifyAlbumId?: string;
+  tracklist?: {
+    side: string;
+    tracks: string[];
+  }[];
 }

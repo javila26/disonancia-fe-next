@@ -15,6 +15,7 @@ interface CategoryStore {
   getCategoryById: (id: string) => Promise<void>;
   addCategory: (body: CategoryPayload) => Promise<boolean>;
   updateCategory: (id: string, body: CategoryPayload) => Promise<boolean>;
+  removeCategory: (id: string) => Promise<boolean>;
 }
 
 export const useCategoryStore = create<CategoryStore>((set, get) => ({
@@ -109,6 +110,32 @@ export const useCategoryStore = create<CategoryStore>((set, get) => ({
       return Boolean(data.success);
     } catch (error) {
       console.error("Update error:", error);
+      return false;
+    } finally {
+      set({ loading: false });
+    }
+  },
+
+  removeCategory: async (id) => {
+    try {
+      set({ loading: true });
+
+      const response = await api.delete<{ success: boolean; data?: { id: string } }>(`/categories/${id}`);
+      const data = response.data;
+
+      if (data.success && data.data) {
+        const deletedId = data.data.id;
+
+        set((state) => ({
+          currentCategory: state.currentCategory?.id === deletedId ? null : state.currentCategory,
+          categories: state.categories.filter((category) => category.id !== deletedId),
+          total: Math.max(0, state.total - 1),
+        }));
+      }
+
+      return Boolean(data.success);
+    } catch (error) {
+      console.error("Delete error:", error);
       return false;
     } finally {
       set({ loading: false });

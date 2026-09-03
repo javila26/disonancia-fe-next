@@ -25,7 +25,8 @@ export async function loadVinyls(
     });
 
     const resp = await fetch(`${process.env.API_BASE_URL}/vinyls?${params.toString()}`, {
-      next: { revalidate: 60 },
+      cache: "force-cache",
+      next: { tags: ["vinyls"] },
     });
 
     if (!resp.ok) {

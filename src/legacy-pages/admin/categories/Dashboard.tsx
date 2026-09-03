@@ -14,20 +14,39 @@ import type { Category } from "@/types/category";
 import type { ColumnDef } from "@tanstack/react-table";
 import { MoreHorizontal } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
-const columns: ColumnDef<Category>[] = [
-  {
-    accessorKey: "name",
-    header: "Name",
-  },
-  {
-    accessorKey: "slug",
-    header: "Slug",
-  },
-  {
-    header: "Actions",
-    cell: ({ row }) => {
-      return (
+export default function CategoriesDashboard() {
+  const { categories, total, fetchCategories, removeCategory } = useCategoryStore();
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to delete this category?")) {
+      return;
+    }
+
+    const toastId = toast.loading("Deleting category...");
+    const deleted = await removeCategory(id);
+
+    if (deleted) {
+      toast.success("Category deleted successfully.", { id: toastId });
+      return;
+    }
+
+    toast.error("Could not delete the category.", { id: toastId });
+  };
+
+  const columns: ColumnDef<Category>[] = [
+    {
+      accessorKey: "name",
+      header: "Name",
+    },
+    {
+      accessorKey: "slug",
+      header: "Slug",
+    },
+    {
+      header: "Actions",
+      cell: ({ row }) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="h-8 w-8 p-0">
@@ -40,15 +59,12 @@ const columns: ColumnDef<Category>[] = [
             <Link href={`categories/${row.original.id}`}>
               <DropdownMenuItem>Edit</DropdownMenuItem>
             </Link>
+            <DropdownMenuItem onClick={() => void handleDelete(row.original.id)}>Delete</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      );
+      ),
     },
-  },
-];
-
-export default function CategoriesDashboard() {
-  const { categories, total, fetchCategories } = useCategoryStore();
+  ];
 
   return (
     <section>

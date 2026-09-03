@@ -59,6 +59,19 @@ export function VinylDetailsSection({
         </div>
 
         <div>
+          <Label htmlFor="spotifyAlbumId" className="text-sm font-medium text-zinc-200">
+            Spotify Album ID
+          </Label>
+          <input
+            id="spotifyAlbumId"
+            value={formData.spotifyAlbumId}
+            onChange={(event) => updateField("spotifyAlbumId", event.target.value)}
+            className={inputClasses}
+            placeholder="4m2880jivSbbyEGAKfITCa"
+          />
+        </div>
+
+        <div>
           <Label htmlFor="slug" className="text-sm font-medium text-zinc-200">
             Slug
           </Label>

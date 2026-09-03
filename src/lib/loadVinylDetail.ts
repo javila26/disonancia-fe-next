@@ -3,7 +3,8 @@ import type { Product } from "@/types/product";
 export async function loadVinylDetail(slug: string): Promise<Product | null> {
   try {
     const resp = await fetch(`${process.env.API_BASE_URL}/vinyls/${slug}`, {
-      next: { revalidate: 60 },
+      cache: "force-cache",
+      next: { tags: [`vinyls:${slug}`] },
     });
 
     if (!resp.ok) {

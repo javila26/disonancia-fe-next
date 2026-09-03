@@ -1,6 +1,7 @@
 import type { EntityResponse, PaginatedResponse } from "@/types/api";
 import type { Product } from "@/types/product";
 import api from "@/lib/api";
+import { revalidateVinylCache } from "@/app/actions/vinyl-cache";
 import { create } from "zustand";
 
 type PriceRange = [number, number];
@@ -13,6 +14,7 @@ type ProductPayload = {
   name: string;
   slug: string;
   artist: string;
+  spotifyAlbumId: string;
   year: number;
   price: number;
   purchasePrice: number;
@@ -20,6 +22,10 @@ type ProductPayload = {
   stock: number;
   category: string;
   numberOfDiscs: number;
+  tracklist: {
+    side: string;
+    tracks: string[];
+  }[];
   available: boolean;
   images: ProductImagePayload[];
 };
@@ -109,7 +115,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
     try {
       set({ loading: true });
 
-      const response = await api.post<EntityResponse<Product>>("/api/vinyls", body);
+      const response = await api.post<EntityResponse<Product>>("/vinyls", body);
       const data = response.data;
 
       if (data.success && data.data) {
@@ -117,6 +123,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
           products: [data.data, ...state.products],
           total: state.total + 1,
         }));
+        await revalidateVinylCache(data.data.slug);
       }
 
       return Boolean(data.success);
@@ -140,6 +147,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
           currentProduct: data.data,
           products: state.products.map((product) => (product.id === id ? data.data : product)),
         }));
+        await revalidateVinylCache(data.data.slug ?? body.slug);
       }
 
       return Boolean(data.success);
@@ -154,6 +162,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
   removeProduct: async (id) => {
     try {
       set({ loading: true });
+      const slug = get().products.find((product) => product.id === id)?.slug;
 
       const response = await api.delete<{ success: boolean }>(`/vinyls/${id}`);
       const data = response.data;
@@ -164,6 +173,7 @@ export const useProductStore = create<ProductStore>((set, get) => ({
           products: state.products.filter((product) => product.id !== id),
           total: Math.max(0, state.total - 1),
         }));
+        await revalidateVinylCache(slug);
       }
 
       return Boolean(data.success);

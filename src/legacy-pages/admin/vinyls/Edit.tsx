@@ -9,12 +9,14 @@ import { toast } from "sonner";
 
 import { VinylDetailsSection } from "@/components/admin/vinyls/VinylDetailsSection";
 import { VinylMediaSection } from "@/components/admin/vinyls/VinylMediaSection";
+import { VinylTracklistSection } from "@/components/admin/vinyls/VinylTracklistSection";
 import { Button } from "@/components/ui/button";
 import { useCategoryStore } from "@/store/useCategoryStore";
 import { useProductStore } from "@/store/useProductsStore";
 import {
   buildVinylPayload,
   buildVinylUpdatePayload,
+  createVinylTracklist,
   createVinylFormState,
   createVinylImagePreviewState,
   initialFormState,
@@ -86,10 +88,18 @@ export default function EditPage() {
   }, [categories, currentProduct, id]);
 
   const updateField = <TKey extends keyof VinylFormState>(field: TKey, value: VinylFormState[TKey]) => {
-    setFormData((current) => ({
-      ...current,
-      [field]: value,
-    }));
+    setFormData((current) => {
+      const next = {
+        ...current,
+        [field]: value,
+      };
+
+      if (field === "numberOfDiscs") {
+        next.tracklist = createVinylTracklist(value as number, current.tracklist);
+      }
+
+      return next;
+    });
   };
 
   const handleImageChange = (index: 0 | 1 | 2, file: File | null) => {
@@ -144,6 +154,7 @@ export default function EditPage() {
           categoriesLoading={categoriesLoading}
           updateField={updateField}
         />
+        <VinylTracklistSection tracklist={formData.tracklist} updateField={updateField} />
         <VinylMediaSection
           images={formData.images}
           existingImageUrls={existingImageUrls}
