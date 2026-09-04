@@ -48,7 +48,7 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
           }}
           className="text-xs text-white/60 underline underline-offset-4 hover:text-white"
         >
-          Clear all
+          Remover
         </button>
       </div>
       <Accordion type="multiple">
@@ -104,7 +104,7 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="category">
-          <AccordionTrigger className="font-[plus_jakarta_sans]">Categoría</AccordionTrigger>
+          <AccordionTrigger className="font-[plus_jakarta_sans]">Género</AccordionTrigger>
           <AccordionContent>
             {categories.map((item) => (
               <div key={item.id} className="flex min-h-10 items-center space-x-2">

@@ -34,16 +34,16 @@ export default function Navbar() {
         </div>
 
         {/* Desktop Menu */}
-        {!isMobile && (
+        {/* {!isMobile && (
           <ul className="flex gap-8 text-white text-xl mr-6">
             <Link href={"/"} className={`font-[plus_jakarta_sans] text-2xl ${isActive("/")}`}>
-              Home
+              Inicio
             </Link>
             <Link href={"/about"} className={`font-[plus_jakarta_sans] text-2xl ${isActive("/about")}`}>
               About
             </Link>
           </ul>
-        )}
+        )} */}
 
         {/* Mobile Menu */}
         {isMobile && (
@@ -56,11 +56,11 @@ export default function Navbar() {
             <SheetContent side="right" className="bg-[#1a1a1a] text-white">
               <nav className="m-6 flex flex-col gap-6">
                 <Link href="/" className={`text-2xl font-[plus_jakarta_sans] ${isActive("/")}`}>
-                  Home
+                  Inicio
                 </Link>
-                <Link href="/about" className={`text-2xl font-[plus_jakarta_sans] ${isActive("/about")}`}>
+                {/* <Link href="/about" className={`text-2xl font-[plus_jakarta_sans] ${isActive("/about")}`}>
                   About
-                </Link>
+                </Link> */}
               </nav>
             </SheetContent>
           </Sheet>
