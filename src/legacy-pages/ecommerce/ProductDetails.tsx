@@ -1,4 +1,5 @@
 import ImagesCarousell from "@/components/images-carousel";
+import { SpotifyAlbumEmbed } from "@/components/spotify-album-embed";
 import TracklistTable from "@/components/tracklist-table";
 import type { Product } from "@/types/product";
 import type { VinylImage } from "@/types/vinyl-image";
@@ -61,17 +62,8 @@ export default function ProductDetails({ vinylRecord }: ProductDetailsProps) {
           <p className="mb-3 font-[plus_jakarta_sans] text-sm uppercase tracking-[0.2em] text-white/50">
             Listen before you buy
           </p>
-          <iframe
-            title={`Listen to ${vinylRecord?.name ?? "this record"}`}
-            data-testid="embed-iframe"
-            src={`https://open.spotify.com/embed/album/${vinylRecord?.spotifyAlbumId}?utm_source=generator&si=46979d817e6d4dff`}
-            width="100%"
-            height="515"
-            frameBorder="0"
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy"
-            className="max-w-full rounded-xl"
-          />
+
+          <SpotifyAlbumEmbed albumId={vinylRecord?.spotifyAlbumId} albumName={vinylRecord?.name ?? "this record"} />
         </div>
       </section>
     </main>
