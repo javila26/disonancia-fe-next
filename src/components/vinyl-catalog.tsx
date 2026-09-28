@@ -1,4 +1,5 @@
 import ProductCard from "@/components/product-card";
+import { CatalogPendingBoundary } from "@/components/catalog-navigation";
 import { VinylCatalogLoader } from "@/components/vinyl-catalog-loader";
 import { VinylPageSizeOptions, VinylPagination } from "@/components/vinyl-pagination";
 import { loadVinyls, type VinylFilters } from "@/lib/loadVinyls";
@@ -11,7 +12,15 @@ type VinylCatalogProps = {
   filters: VinylFilters;
 };
 
-export async function VinylCatalog({ requestedPage, pageSize, filters }: VinylCatalogProps) {
+export function VinylCatalog(props: VinylCatalogProps) {
+  return (
+    <Suspense fallback={<VinylCatalogLoader />}>
+      <VinylCatalogContent {...props} />
+    </Suspense>
+  );
+}
+
+async function VinylCatalogContent({ requestedPage, pageSize, filters }: VinylCatalogProps) {
   const { vinylRecords, total } = await loadVinyls(requestedPage - 1, pageSize, filters);
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const currentPage = Math.min(requestedPage, totalPages);
@@ -31,9 +40,9 @@ export async function VinylCatalog({ requestedPage, pageSize, filters }: VinylCa
         <VinylPageSizeOptions pageSize={pageSize} filters={filters} />
       </div>
 
-      <Suspense fallback={<VinylCatalogLoader />}>
+      <CatalogPendingBoundary>
         <VinylGallery vinylRecords={vinylRecords} />
-      </Suspense>
+      </CatalogPendingBoundary>
 
       <VinylPagination currentPage={currentPage} totalPages={totalPages} pageSize={pageSize} filters={filters} />
     </>

@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTransition } from "react";
+import { useCatalogNavigation } from "@/components/catalog-navigation";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./ui/accordion";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
@@ -27,8 +28,10 @@ export default function ServerFilters({ categories }: ServerFiltersProps) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [, startTransition] = useTransition();
+  const { startNavigation } = useCatalogNavigation();
 
   const navigate = (query: string) => {
+    startNavigation(query);
     startTransition(() => router.replace(`${pathname}${query ? `?${query}` : ""}`, { scroll: false }));
   };
 

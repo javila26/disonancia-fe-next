@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { CatalogLink } from "@/components/catalog-navigation";
 
 import type { VinylFilters } from "@/lib/loadVinyls";
 
@@ -47,13 +47,13 @@ export function VinylPageSizeOptions({ pageSize, filters }: VinylPageSizeOptions
     <div className="flex items-center justify-center gap-3 text-sm text-white/60">
       <span>Por página</span>
       {VINYL_PAGE_SIZE_OPTIONS.map((option) => (
-        <Link
+        <CatalogLink
           key={option}
           href={pageHref(1, option, filters)}
           className={option === pageSize ? "font-medium text-white underline underline-offset-4" : "hover:text-white"}
         >
           {option}
-        </Link>
+        </CatalogLink>
       ))}
     </div>
   );
@@ -69,13 +69,13 @@ export function VinylPagination({ currentPage, totalPages, pageSize, filters }: 
         <span className="font-medium text-white">{totalPages}</span>
       </div>
       <nav aria-label="Product pagination" className="flex flex-wrap items-center justify-center gap-2">
-        <Link
+        <CatalogLink
           href={pageHref(1, pageSize, filters)}
           aria-disabled={currentPage === 1}
           className={`rounded-md border border-white/15 bg-[#111111] px-3 py-2 text-sm text-white ${currentPage === 1 ? "pointer-events-none opacity-40" : "hover:bg-[#171717]"}`}
         >
           «
-        </Link>
+        </CatalogLink>
         {visiblePages.map((pageNumber, index) => {
           const previousPage = visiblePages[index - 1];
           const shouldShowEllipsis = previousPage && pageNumber - previousPage > 1;
@@ -83,7 +83,7 @@ export function VinylPagination({ currentPage, totalPages, pageSize, filters }: 
           return (
             <span key={pageNumber} className="flex items-center gap-2">
               {shouldShowEllipsis ? <span className="px-1 text-sm text-white/45">...</span> : null}
-              <Link
+              <CatalogLink
                 href={pageHref(pageNumber, pageSize, filters)}
                 aria-current={currentPage === pageNumber ? "page" : undefined}
                 className={
@@ -93,17 +93,17 @@ export function VinylPagination({ currentPage, totalPages, pageSize, filters }: 
                 }
               >
                 {pageNumber}
-              </Link>
+              </CatalogLink>
             </span>
           );
         })}
-        <Link
+        <CatalogLink
           href={pageHref(totalPages, pageSize, filters)}
           aria-disabled={currentPage === totalPages}
           className={`rounded-md border border-white/15 bg-[#111111] px-3 py-2 text-sm text-white ${currentPage === totalPages ? "pointer-events-none opacity-40" : "hover:bg-[#171717]"}`}
         >
           »
-        </Link>
+        </CatalogLink>
       </nav>
     </div>
   );
